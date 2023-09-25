@@ -1,0 +1,40 @@
+# Deploy demo service pods
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eaterApp
+spec:
+  selector:
+    matchLabels:
+      app: eaterApp
+  template:
+    metadata:
+      labels:
+        app: eaterApp
+    spec:
+      containers:
+        - name: eaterApp
+          image: eaterApp:latest
+          imagePullPolicy: IfNotPresent          
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eaterApp
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: eaterApp
+  type: ClusterIP
