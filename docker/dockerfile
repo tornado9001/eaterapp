@@ -1,0 +1,5 @@
+FROM openjdk:17-oracle
+VOLUME /tmp
+ARG JAR_FILE
+COPY ../build/libs/*.jar eaterapp-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["java","-jar","/eaterapp-0.0.1-SNAPSHOT.jar"]
