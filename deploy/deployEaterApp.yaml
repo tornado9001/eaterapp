@@ -25,6 +25,14 @@ spec:
             - containerPort: 8080
               name: http
               protocol: TCP
+          resources: # setting request and limit, we can use this to set utilization rate.
+            requests: 
+              cpu: 250m
+              memory: 140Mi
+            limits:
+              cpu: 500m
+              memory: 125Mi
+
 ---
 apiVersion: v1
 kind: Service
