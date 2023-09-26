@@ -3,7 +3,7 @@ package poc.scale.usage.eaterapp.api;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.extern.slf4j.Slf4j;
 import poc.scale.usage.eaterapp.model.EaterResponse;
 import poc.scale.usage.eaterapp.model.Version;
 
@@ -24,7 +26,7 @@ public class MemoryApi {
 
   Runtime runtime = Runtime.getRuntime();
 
-  List<String> memoryChunk = new ArrayList<>();
+  List<String> memoryChunk;
 
   /**
    * @param blockSize
@@ -45,6 +47,10 @@ public class MemoryApi {
       // Generate random string with size of blockSize
       String randomString = String.valueOf(Math.random() * 26 + 'a').repeat(blockSize);
 
+      if (memoryChunk == null) {
+        memoryChunk = new ArrayList<>();
+      }
+
       // Add to memory chunk
       memoryChunk.add(randomString);
 
@@ -60,7 +66,7 @@ public class MemoryApi {
         + " kB");
     Map<String, String> data = Map.of("list size", String.valueOf(memoryChunk.size()));
 
-    memoryChunk.clear();
+    memoryChunk = null;
     runtime.gc();
 
     log.info("After Cleared Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024
@@ -77,6 +83,10 @@ public class MemoryApi {
     log.info(
         "Initial Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024 + " kB");
     log.info("Starting memory eater...");
+
+    if (memoryChunk == null) {
+      memoryChunk = new ArrayList<>();
+    }
 
     for (int i = 0; i < blockLoop; i++) {
       // Generate random string with size of blockSize
@@ -108,14 +118,14 @@ public class MemoryApi {
     log.info(
         "Initial Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024 + " kB");
 
-    int originalSize = memoryChunk.size();
+    String originalSize = String.valueOf(memoryChunk == null ? memoryChunk : memoryChunk.size());
 
-    memoryChunk.clear();
+    memoryChunk = null;
     runtime.gc();
 
     Map<String, String> data = Map.of("original list size", String.valueOf(originalSize),
         "after free up memory",
-        String.valueOf(memoryChunk.size()));
+        String.valueOf(String.valueOf(memoryChunk == null ? memoryChunk : memoryChunk.size())));
 
     log.info("After Cleared Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024
         + " kB");
@@ -129,7 +139,7 @@ public class MemoryApi {
         "Current Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024 + " kB");
 
     Map<String, String> data = Map.of("current list size",
-        String.valueOf(memoryChunk.size()));
+        String.valueOf(memoryChunk == null ? memoryChunk : memoryChunk.size()));
 
     return ResponseEntity.ok(new EaterResponse(version, data));
   }
