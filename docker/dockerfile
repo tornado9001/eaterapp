@@ -1,5 +1,18 @@
+################################################################################
+## This is a sample docker configuration for anyone who will like to build a 
+## docker image.
+##
+## Usage:
+## gradlew clean build
+## docker build -t eaterapp -f .\docker\dockerfile .
+## Note above cmd is to be executed from project root folder e.g. ./eaterapp
+## 
+## Shall there any need to update and change some setting, please modify it
+##
+## docker build -t <your_image_name>:<your_image_tag> -f <your_dockerfile> .
+## or you should change some of the line(s) below.
+################################################################################
 FROM openjdk:17-oracle
 VOLUME /tmp
-ARG JAR_FILE
 COPY /build/libs/*.jar eaterapp-0.0.1.jar
 ENTRYPOINT ["java","-jar","/eaterapp-0.0.1.jar"]
