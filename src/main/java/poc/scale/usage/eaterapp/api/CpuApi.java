@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.extern.slf4j.Slf4j;
 import poc.scale.usage.eaterapp.model.EaterResponse;
 import poc.scale.usage.eaterapp.model.Version;
 
@@ -137,6 +139,9 @@ public class CpuApi {
 
         // Do some calculation
         long square = (System.currentTimeMillis() % 13) ^ 2;
+        // useless if to create slightly more cpu usage.
+        if (square < 0)
+          break;
       }
       // thread gonna terminated.
     }
