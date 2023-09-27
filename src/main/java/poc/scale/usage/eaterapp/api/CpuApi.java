@@ -44,7 +44,7 @@ public class CpuApi {
     // Set the thread and timer status into this data
     Map<String, String> data = new HashMap<>();
 
-    if(localThreads == null)
+    if(loadThreads == null)
       loadThreads = new ArrayList();
 
     for (int i = 0; i < threadSize; i++) {
