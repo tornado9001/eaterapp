@@ -118,14 +118,14 @@ public class MemoryApi {
     log.info(
         "Initial Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024 + " kB");
 
-    String originalSize = String.valueOf(memoryChunk == null ? memoryChunk : memoryChunk.size());
+    String originalSize = String.valueOf(memoryChunk == null ? 0 : memoryChunk.size());
 
     memoryChunk = null;
     runtime.gc();
 
     Map<String, String> data = Map.of("original list size", String.valueOf(originalSize),
         "after free up memory",
-        String.valueOf(String.valueOf(memoryChunk == null ? memoryChunk : memoryChunk.size())));
+        String.valueOf(String.valueOf(memoryChunk == null ? 0 : memoryChunk.size())));
 
     log.info("After Cleared Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024
         + " kB");
@@ -139,7 +139,7 @@ public class MemoryApi {
         "Current Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024 + " kB");
 
     Map<String, String> data = Map.of("current list size",
-        String.valueOf(memoryChunk == null ? memoryChunk : memoryChunk.size()));
+        String.valueOf(memoryChunk == null ? 0 : memoryChunk.size()));
 
     return ResponseEntity.ok(new EaterResponse(version, data));
   }

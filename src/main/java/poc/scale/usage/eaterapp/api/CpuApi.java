@@ -30,7 +30,7 @@ public class CpuApi {
 
   Thread timerThread;
 
-  List<Thread> loadThreads = new ArrayList<>();
+  List<Thread> loadThreads = null;
 
   @PostMapping("/threads/start")
   public ResponseEntity<EaterResponse> processorEaterStart(
@@ -43,6 +43,9 @@ public class CpuApi {
 
     // Set the thread and timer status into this data
     Map<String, String> data = new HashMap<>();
+
+    if(localThreads == null)
+      loadThreads = new ArrayList();
 
     for (int i = 0; i < threadSize; i++) {
       Thread myThread;
@@ -101,7 +104,7 @@ public class CpuApi {
     });
 
     data.put("timer status",
-        String.valueOf(timerThread == null ? timerThread : timerThread.getState()));
+        String.valueOf(timerThread == null ? 0 : timerThread.getState()));
 
     return ResponseEntity.ok(new EaterResponse(version, data));
   }
