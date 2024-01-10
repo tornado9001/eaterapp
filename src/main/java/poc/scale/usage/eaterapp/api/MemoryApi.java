@@ -28,61 +28,14 @@ public class MemoryApi {
 
   List<String> memoryChunk;
 
-  /**
-   * @param blockSize
-   * @param blockLoop
-   * @param loopDelay
-   * @return
-   */
-  @PostMapping("/eater/volatile")
-  public ResponseEntity<EaterResponse> memoryEaterTemporarly(
-      @RequestParam(defaultValue = "1024") int blockSize,
-      @RequestParam(defaultValue = "1") int blockLoop,
-      @RequestParam(defaultValue = "0") int loopDelay) {
-    log.info(
-        "Initial Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024 + " kB");
-    log.info("Starting memory eater...");
-
-    for (int i = 0; i < blockLoop; i++) {
-      // Generate random string with size of blockSize
-      String randomString = String.valueOf(Math.random() * 26 + 'a').repeat(blockSize);
-
-      if (memoryChunk == null) {
-        memoryChunk = new ArrayList<>();
-      }
-
-      // Add to memory chunk
-      memoryChunk.add(randomString);
-
-      // Thread sleep
-      try {
-        Thread.sleep(loopDelay);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-
-    log.info("After Eater Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024
-        + " kB");
-    Map<String, String> data = Map.of("list size", String.valueOf(memoryChunk.size()));
-
-    memoryChunk = null;
-    runtime.gc();
-
-    log.info("After Cleared Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024
-        + " kB");
-
-    return ResponseEntity.ok(new EaterResponse(version, data));
-  }
-
-  @PostMapping("/eater/permanent")
+  @PostMapping("/eater/heap")
   public ResponseEntity<EaterResponse> memoryEaterPermanent(
       @RequestParam(defaultValue = "1024") int blockSize,
       @RequestParam(defaultValue = "1") int blockLoop,
       @RequestParam(defaultValue = "0") int loopDelay) {
     log.info(
         "Initial Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024 + " kB");
-    log.info("Starting memory eater...");
+    log.info("Starting memory eater consuming heap...");
 
     if (memoryChunk == null) {
       memoryChunk = new ArrayList<>();
@@ -105,7 +58,13 @@ public class MemoryApi {
 
     log.info("After Eater Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024
         + " kB");
-    Map<String, String> data = Map.of("list size", String.valueOf(memoryChunk.size()));
+
+    double heapUsage = (double) (runtime.totalMemory() - runtime.freeMemory()) / (double) runtime.totalMemory() * 100;
+
+    log.info(String.format("Heap usage %.2f %%", heapUsage));
+
+    Map<String, String> data = Map.of("list size", String.valueOf(memoryChunk.size()), "heap usage",
+        String.format("%.2f%%", heapUsage));
 
     return ResponseEntity.ok(new EaterResponse(version, data));
   }
@@ -123,9 +82,14 @@ public class MemoryApi {
     memoryChunk = null;
     runtime.gc();
 
+    double heapUsage = (double) (runtime.totalMemory() - runtime.freeMemory()) / (double) runtime.totalMemory() * 100;
+
+    log.info(String.format("Heap usage %.2f %%", heapUsage));
+
     Map<String, String> data = Map.of("original list size", String.valueOf(originalSize),
         "after free up memory",
-        String.valueOf(String.valueOf(memoryChunk == null ? 0 : memoryChunk.size())));
+        String.valueOf(String.valueOf(memoryChunk == null ? 0 : memoryChunk.size())), "heap usage",
+        String.format("%.2f%%", heapUsage));
 
     log.info("After Cleared Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024
         + " kB");
@@ -135,11 +99,17 @@ public class MemoryApi {
 
   @GetMapping("/eater/size")
   public ResponseEntity<EaterResponse> memorySize() {
+
     log.info(
         "Current Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / 1024 + " kB");
 
+    double heapUsage = (double) (runtime.totalMemory() - runtime.freeMemory()) / (double) runtime.totalMemory() * 100;
+
+    log.info(String.format("Heap usage %.2f %%", heapUsage));
+
     Map<String, String> data = Map.of("current list size",
-        String.valueOf(memoryChunk == null ? 0 : memoryChunk.size()));
+        String.valueOf(memoryChunk == null ? 0 : memoryChunk.size()), "heap usage",
+        String.format("%.2f%%", heapUsage));
 
     return ResponseEntity.ok(new EaterResponse(version, data));
   }
