@@ -15,4 +15,5 @@
 FROM openjdk:17-oracle
 VOLUME /tmp
 COPY /build/libs/*.jar eaterapp-0.0.1.jar
+EXPOSE 8080
 ENTRYPOINT ["java","-jar","/eaterapp-0.0.1.jar"]
